@@ -1,6 +1,5 @@
-const express = require('express');
-const router = express.Router();
+const feedbackRoutes = require('./routes/feedbackRoutes');
 
 module.exports = {
-    routes: router,
+    routes: feedbackRoutes
 };

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const employeeController = require('../controllers/employeeController');
-const authMiddleware = require('../../../middleware/authMiddleware');
+const { authMiddleware } = require('../../../middleware/authMiddleware');
 const roleMiddleware = require('../../../middleware/roleMiddleware');
 const logMiddleware = require('../../../middleware/logMiddleware');
 

@@ -1,0 +1,762 @@
+openapi: 3.0.0
+info:
+  title: Franchie API
+  version: 1.0.0
+  description: API для системы управления франшизой
+
+servers:
+  - url: http://localhost:3000
+    description: Локальный сервер разработки
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [ADMIN, PARTNER, EMPLOYEE]
+        createdAt:
+          type: string
+          format: date-time
+
+    Partner:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        name:
+          type: string
+
+    Location:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        address:
+          type: string
+        partnerId:
+          type: string
+          format: uuid
+
+    Employee:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        userId:
+          type: string
+          format: uuid
+        locationId:
+          type: string
+          format: uuid
+
+    Menu:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        price:
+          type: number
+          format: float
+        locationId:
+          type: string
+          format: uuid
+        isActive:
+          type: boolean
+
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        total:
+          type: number
+          format: float
+        createdAt:
+          type: string
+          format: date-time
+        locationId:
+          type: string
+          format: uuid
+        employeeId:
+          type: string
+          format: uuid
+
+    Feedback:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        locationId:
+          type: string
+          format: uuid
+
+    Device:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        login:
+          type: string
+        password:
+          type: string
+        locationId:
+          type: string
+          format: uuid
+
+    Analytics:
+      type: object
+      properties:
+        totalOrders:
+          type: integer
+        totalRevenue:
+          type: number
+          format: float
+        averageRating:
+          type: number
+          format: float
+        period:
+          type: string
+          enum: [DAY, WEEK, MONTH, YEAR]
+
+paths:
+  /auth/register/admin:
+    post:
+      tags:
+        - Аутентификация
+      summary: Регистрация администратора
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                name:
+                  type: string
+      responses:
+        '201':
+          description: Администратор успешно зарегистрирован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /auth/login:
+    post:
+      tags:
+        - Аутентификация
+      summary: Вход в систему
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Успешный вход
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+
+  /auth/me:
+    get:
+      tags:
+        - Аутентификация
+      summary: Получить текущего пользователя
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Информация о текущем пользователе
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /auth/change-password:
+    post:
+      tags:
+        - Аутентификация
+      summary: Изменить пароль
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                currentPassword:
+                  type: string
+                newPassword:
+                  type: string
+      responses:
+        '200':
+          description: Пароль успешно изменен
+
+  /admin/partners:
+    post:
+      tags:
+        - Администратор
+      summary: Создать нового партнера
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                name:
+                  type: string
+      responses:
+        '201':
+          description: Партнер успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partner'
+    get:
+      tags:
+        - Администратор
+      summary: Получить список партнеров
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Список партнеров
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partner'
+
+  /admin/locations:
+    post:
+      tags:
+        - Администратор
+      summary: Создать новую локацию
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                address:
+                  type: string
+                partnerId:
+                  type: string
+                  format: uuid
+      responses:
+        '201':
+          description: Локация успешно создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+    get:
+      tags:
+        - Администратор
+      summary: Получить список локаций
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Список локаций
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Location'
+
+  /partner/profile:
+    get:
+      tags:
+        - Партнер
+      summary: Получить профиль партнера
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Профиль партнера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partner'
+
+  /partner/locations:
+    get:
+      tags:
+        - Партнер
+      summary: Получить список локаций партнера
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Список локаций
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Location'
+
+  /partner/employees:
+    post:
+      tags:
+        - Партнер
+      summary: Создать нового сотрудника
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                name:
+                  type: string
+                locationId:
+                  type: string
+                  format: uuid
+      responses:
+        '201':
+          description: Сотрудник успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+    delete:
+      tags:
+        - Партнер
+      summary: Удалить сотрудника
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: employeeId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Сотрудник успешно удален
+
+  /partner/devices:
+    post:
+      tags:
+        - Партнер
+      summary: Создать учетные данные устройства
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                locationId:
+                  type: string
+                  format: uuid
+      responses:
+        '201':
+          description: Учетные данные устройства созданы
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+
+  /partner/menu:
+    get:
+      tags:
+        - Партнер
+      summary: Получить меню
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Список позиций меню
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Menu'
+    post:
+      tags:
+        - Партнер
+      summary: Создать позицию меню
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                price:
+                  type: number
+                  format: float
+                locationId:
+                  type: string
+                  format: uuid
+      responses:
+        '201':
+          description: Позиция меню создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Menu'
+
+  /partner/menu/{menuId}:
+    get:
+      tags:
+        - Партнер
+      summary: Получить позицию меню
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: menuId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Позиция меню
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Menu'
+    put:
+      tags:
+        - Партнер
+      summary: Обновить позицию меню
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: menuId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                price:
+                  type: number
+                  format: float
+                isActive:
+                  type: boolean
+      responses:
+        '200':
+          description: Позиция меню обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Menu'
+    delete:
+      tags:
+        - Партнер
+      summary: Удалить позицию меню
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: menuId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Позиция меню удалена
+
+  /partner/locations/{locationId}/orders:
+    get:
+      tags:
+        - Партнер
+      summary: Получить заказы локации
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: locationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Список заказов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+
+  /partner/locations/{locationId}/feedbacks:
+    get:
+      tags:
+        - Партнер
+      summary: Получить отзывы локации
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: locationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Список отзывов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Feedback'
+
+  /partner/locations/{locationId}/analytics:
+    get:
+      tags:
+        - Партнер
+      summary: Получить аналитику локации
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: locationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: period
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [DAY, WEEK, MONTH, YEAR]
+      responses:
+        '200':
+          description: Аналитика локации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Analytics'
+
+  /partner/locations/{locationId}/statistics:
+    get:
+      tags:
+        - Партнер
+      summary: Получить статистику локации
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: locationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Статистика локации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Analytics'
+
+  /employee/profile:
+    get:
+      tags:
+        - Сотрудник
+      summary: Получить профиль сотрудника
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Профиль сотрудника
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+
+  /employee/menu:
+    get:
+      tags:
+        - Сотрудник
+      summary: Получить меню локации
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Список позиций меню
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Menu'
+
+  /employee/orders:
+    get:
+      tags:
+        - Сотрудник
+      summary: Получить список заказов
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Список заказов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+    post:
+      tags:
+        - Сотрудник
+      summary: Создать новый заказ
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                total:
+                  type: number
+                  format: float
+      responses:
+        '201':
+          description: Заказ создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+
+  /feedback:
+    post:
+      tags:
+        - Отзывы
+      summary: Создать новый отзыв
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rating:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                comment:
+                  type: string
+                locationId:
+                  type: string
+                  format: uuid
+      responses:
+        '201':
+          description: Отзыв создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feedback' 
