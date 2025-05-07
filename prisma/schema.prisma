@@ -1,0 +1,104 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  PARTNER
+  EMPLOYEE
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      Role
+  createdAt DateTime @default(now())
+
+  partner   Partner?
+  employee  Employee?
+}
+
+model Partner {
+  id        String     @id @default(uuid())
+  userId    String     @unique
+  name      String
+  user      User       @relation(fields: [userId], references: [id])
+  locations Location[]
+}
+
+model Location {
+  id         String      @id @default(uuid())
+  name       String
+  address    String
+  partnerId  String
+  partner    Partner     @relation(fields: [partnerId], references: [id])
+  employees  Employee[]
+  menus      Menu[]
+  orders     Order[]
+  feedbacks  Feedback[]
+  devices    Device[]
+}
+
+model Employee {
+  id         String   @id @default(uuid())
+  name       String
+  userId     String   @unique
+  locationId String
+  location   Location @relation(fields: [locationId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+  orders     Order[]
+}
+
+model Device {
+  id          String   @id @default(uuid())
+  login       String   @unique
+  password    String
+  locationId  String
+  location    Location @relation(fields: [locationId], references: [id])
+}
+
+model Menu {
+  id         String   @id @default(uuid())
+  name       String
+  price      Float
+  locationId String
+  location   Location @relation(fields: [locationId], references: [id])
+  isActive   Boolean  @default(true)
+}
+
+model Order {
+  id          String   @id @default(uuid())
+  total       Float
+  createdAt   DateTime @default(now())
+  locationId  String
+  location    Location @relation(fields: [locationId], references: [id])
+  employeeId  String
+  employee    Employee @relation(fields: [employeeId], references: [id])
+}
+
+model Feedback {
+  id          String   @id @default(uuid())
+  rating      Int
+  comment     String
+  createdAt   DateTime @default(now())
+  locationId  String
+  location    Location @relation(fields: [locationId], references: [id])
+}
+
+model Log {
+  id        String   @id @default(uuid())
+  userId    String
+  role      Role
+  endpoint  String
+  method    String
+  timestamp DateTime @default(now())
+}
