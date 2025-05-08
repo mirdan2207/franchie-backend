@@ -11,7 +11,7 @@
 
 1. Склонируйте репозиторий:
 ```bash
-git clone <repository-url>
+git clone https://github.com/mirdan2207/franchie-backend
 cd franchie-backend
 ```
 
@@ -27,19 +27,10 @@ docker-compose up -d
 
 ## Доступные сервисы
 
-- Backend API: http://localhost:3000
-- Swagger документация: http://localhost:3000/api-docs
+- Backend API: http://localhost/api/*
+- Swagger документация: swagger.yaml
 - Grafana: http://localhost:3001 (admin/admin)
 
-## Переменные окружения
-
-Создайте файл `.env` со следующими переменными:
-
-```env
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-POSTGRES_DB=franchie
-```
 
 ## Остановка сервисов
 
