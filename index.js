@@ -3,11 +3,20 @@ const express = require('express');
 const configureApp = require('./config/app');
 const routes = require('./routes');
 const errorHandler = require('./middleware/errorHandler');
+const metricsMiddleware = require('./middleware/metrics');
+const { register } = require('./config/metrics');
 
 const app = express();
 
-// Configure app
 configureApp(app);
+
+app.use(metricsMiddleware);
+
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
+});
+
 
 // Routes
 app.use('/api', routes);
