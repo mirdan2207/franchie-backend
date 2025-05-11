@@ -6,10 +6,11 @@ const metricsMiddleware = (req, res, next) => {
   res.on('finish', () => {
     const duration = Date.now() - start;
     const route = req.route ? req.route.path : req.path;
+    const timestamp = Date.now();
     
     httpRequestDurationMicroseconds
       .labels(req.method, route, res.statusCode.toString())
-      .observe(duration / 1000); // конвертируем в секунды
+      .observe(duration / 1000, timestamp); // конвертируем в секунды и добавляем временную метку
   });
   
   next();

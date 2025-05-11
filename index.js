@@ -19,7 +19,7 @@ app.get('/metrics', async (req, res) => {
 
 
 // Routes
-app.use('/api', routes);
+app.use('/', routes);
 
 // Error handling
 app.use(errorHandler);
