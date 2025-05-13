@@ -31,6 +31,9 @@ components:
         createdAt:
           type: string
           format: date-time
+        updatedAt:
+          type: string
+          format: date-time
 
     Partner:
       type: object
@@ -43,6 +46,12 @@ components:
           format: uuid
         name:
           type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
 
     Location:
       type: object
@@ -57,6 +66,12 @@ components:
         partnerId:
           type: string
           format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
 
     Employee:
       type: object
@@ -72,6 +87,12 @@ components:
         locationId:
           type: string
           format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
 
     Menu:
       type: object
@@ -121,12 +142,15 @@ components:
           maximum: 5
         comment:
           type: string
-        createdAt:
-          type: string
-          format: date-time
         locationId:
           type: string
           format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
 
     Device:
       type: object
@@ -158,6 +182,22 @@ components:
           enum: [DAY, WEEK, MONTH, YEAR]
 
 paths:
+  /:
+    get:
+      tags:
+        - Общее
+      summary: Проверка работоспособности API
+      responses:
+        '200':
+          description: API работает
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
   /auth/register/admin:
     post:
       tags:
@@ -252,10 +292,26 @@ paths:
         '200':
           description: Пароль успешно изменен
 
-  /admin/partners:
+  /partner:
+    get:
+      tags:
+        - Партнеры
+      summary: Получить список партнеров
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Список партнеров
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partner'
+
     post:
       tags:
-        - Администратор
+        - Партнеры
       summary: Создать нового партнера
       security:
         - bearerAuth: []
@@ -280,21 +336,287 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Partner'
+
+  /partner/{id}:
     get:
       tags:
-        - Администратор
-      summary: Получить список партнеров
+        - Партнеры
+      summary: Получить информацию о партнере
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Информация о партнере
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partner'
+
+    put:
+      tags:
+        - Партнеры
+      summary: Обновить информацию о партнере
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Информация о партнере обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partner'
+
+    delete:
+      tags:
+        - Партнеры
+      summary: Удалить партнера
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Партнер успешно удален
+
+  /employee:
+    get:
+      tags:
+        - Сотрудники
+      summary: Получить список сотрудников
       security:
         - bearerAuth: []
       responses:
         '200':
-          description: Список партнеров
+          description: Список сотрудников
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Partner'
+                  $ref: '#/components/schemas/Employee'
+
+    post:
+      tags:
+        - Сотрудники
+      summary: Создать нового сотрудника
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                name:
+                  type: string
+                locationId:
+                  type: string
+                  format: uuid
+      responses:
+        '201':
+          description: Сотрудник успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+
+  /employee/{id}:
+    get:
+      tags:
+        - Сотрудники
+      summary: Получить информацию о сотруднике
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Информация о сотруднике
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+
+    put:
+      tags:
+        - Сотрудники
+      summary: Обновить информацию о сотруднике
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                locationId:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: Информация о сотруднике обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+
+    delete:
+      tags:
+        - Сотрудники
+      summary: Удалить сотрудника
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Сотрудник успешно удален
+
+  /feedback:
+    get:
+      tags:
+        - Отзывы
+      summary: Получить список отзывов
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: locationId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Список отзывов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Feedback'
+
+    post:
+      tags:
+        - Отзывы
+      summary: Создать новый отзыв
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rating:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                comment:
+                  type: string
+                locationId:
+                  type: string
+                  format: uuid
+      responses:
+        '201':
+          description: Отзыв успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feedback'
+
+  /feedback/{id}:
+    get:
+      tags:
+        - Отзывы
+      summary: Получить информацию об отзыве
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Информация об отзыве
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feedback'
+
+    delete:
+      tags:
+        - Отзывы
+      summary: Удалить отзыв
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Отзыв успешно удален
 
   /admin/locations:
     post:
@@ -730,33 +1052,4 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
-
-  /feedback:
-    post:
-      tags:
-        - Отзывы
-      summary: Создать новый отзыв
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                rating:
-                  type: integer
-                  minimum: 1
-                  maximum: 5
-                comment:
-                  type: string
-                locationId:
-                  type: string
-                  format: uuid
-      responses:
-        '201':
-          description: Отзыв создан
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Feedback' 
+                $ref: '#/components/schemas/Order' 
