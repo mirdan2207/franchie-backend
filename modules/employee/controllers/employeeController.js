@@ -38,15 +38,16 @@ class EmployeeController {
                 return res.status(403).json({ error: 'Доступ запрещен. Требуются права сотрудника' });
             }
 
-            const { total } = req.body;
-            if (!total || total <= 0) {
+            const { customerName, total, orderItems } = req.body;
+            if (!total || total <= 0 || !customerName || !orderItems) {
                 return res.status(400).json({ error: 'Некорректная сумма заказа' });
             }
 
             const order = await employeeService.createOrder(
                 req.user.employee.id,
                 req.user.employee.locationId,
-                total
+                customerName,
+                orderItems
             );
             res.status(201).json(order);
         } catch (error) {

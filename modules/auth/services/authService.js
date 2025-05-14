@@ -78,7 +78,7 @@ class AuthService {
 
     // Формируем ответ в зависимости от роли
     const userResponse = {
-      id: user.id,
+      // id: user.id,
       email: user.email,
       role: user.role
     };
@@ -86,9 +86,7 @@ class AuthService {
     if (user.role === 'PARTNER' && user.partner) {
       userResponse.partner = {
         id: user.partner.id,
-        firstName: user.partner.firstName,
-        lastName: user.partner.lastName,
-        phone: user.partner.phone
+        name: user.partner.name,
       };
     }
 
@@ -96,7 +94,13 @@ class AuthService {
       userResponse.employee = {
         id: user.employee.id,
         name: user.employee.name,
-        locationId: user.employee.locationId
+        rating: user.employee.rating,
+        position: user.employee.position,
+        phone: user.employee.phone,
+        telegram: user.employee.telegram,
+        experience: user.employee.experience,
+        hiredDate: user.employee.hiredDate,
+        // locationId: user.employee.locationId
       };
     }
 

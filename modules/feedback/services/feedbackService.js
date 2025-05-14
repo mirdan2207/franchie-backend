@@ -3,24 +3,26 @@ const prisma = new PrismaClient();
 
 class FeedbackService {
     // Создание отзыва
-    async createFeedback(locationId, rating, comment) {
+    async createFeedback(rating, comment, employeeId, customerName) {
         // Проверяем валидность рейтинга
         if (rating < 1 || rating > 5) {
             throw new Error('Рейтинг должен быть от 1 до 5');
         }
 
-        return prisma.feedback.create({
+        return prisma.review.create({
             data: {
+                employeeId,
+                customerName,
                 rating,
                 comment,
-                locationId
+                // locationId
             }
         });
     }
 
     // Получение отзывов по локации
     async getLocationFeedbacks(locationId, startDate, endDate) {
-        return prisma.feedback.findMany({
+        return prisma.review.findMany({
             where: {
                 locationId,
                 createdAt: {
@@ -36,7 +38,7 @@ class FeedbackService {
 
     // Получение статистики по отзывам
     async getFeedbackStatistics(locationId, startDate, endDate) {
-        const feedbacks = await prisma.feedback.findMany({
+        const feedbacks = await prisma.review.findMany({
             where: {
                 locationId,
                 createdAt: {

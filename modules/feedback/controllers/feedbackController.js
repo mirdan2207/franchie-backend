@@ -4,13 +4,13 @@ class FeedbackController {
     // Создание отзыва
     async createFeedback(req, res) {
         try {
-            const { locationId, rating, comment } = req.body;
+            const { rating, comment, employeeId, customerName } = req.body;
 
-            if (!locationId || !rating || !comment) {
+            if (!employeeId || !rating || !comment || !customerName) {
                 return res.status(400).json({ error: 'Все поля обязательны для заполнения' });
             }
 
-            const feedback = await feedbackService.createFeedback(locationId, rating, comment);
+            const feedback = await feedbackService.createFeedback(rating, comment, employeeId, customerName);
             res.status(201).json(feedback);
         } catch (error) {
             console.error('Error creating feedback:', error);

@@ -55,7 +55,7 @@ class PartnerService {
         });
 
         // Получаем статистику по отзывам
-        const feedbacks = await prisma.feedback.findMany({
+        const feedbacks = await prisma.review.findMany({
             where: {
                 locationId,
                 createdAt: {
@@ -112,7 +112,7 @@ class PartnerService {
     }
 
     // Управление сотрудниками
-    async createEmployee(partnerId, locationId, email, name, password) {
+    async createEmployee(partnerId, locationId, email, name, password, position, phone, telegram, experience, hiredDate) {
         // Проверяем, что локация принадлежит партнеру
         const location = await prisma.location.findFirst({
             where: {
@@ -137,7 +137,12 @@ class PartnerService {
                 employee: {
                     create: {
                         name,
-                        locationId
+                        locationId,
+                        position, 
+                        phone, 
+                        telegram, 
+                        experience, 
+                        hiredDate
                     }
                 }
             },
@@ -218,7 +223,7 @@ class PartnerService {
     }
 
     // Управление меню
-    async createMenuItem(partnerId, locationId, name, price) {
+    async createMenuItem(partnerId, locationId, name, price, category, description) {
         // Проверяем, что локация принадлежит партнеру
         const location = await prisma.location.findFirst({
             where: {
@@ -235,7 +240,9 @@ class PartnerService {
             data: {
                 name,
                 price,
-                locationId
+                locationId,
+                category,
+                description
             }
         });
     }
@@ -330,7 +337,7 @@ class PartnerService {
             throw new Error('Локация не найдена или не принадлежит партнеру');
         }
 
-        return prisma.feedback.findMany({
+        return prisma.review.findMany({
             where: {
                 locationId,
                 createdAt: {
@@ -373,7 +380,7 @@ class PartnerService {
         });
 
         // Получаем отзывы
-        const feedbacks = await prisma.feedback.findMany({
+        const feedbacks = await prisma.review.findMany({
             where: {
                 locationId,
                 createdAt: {

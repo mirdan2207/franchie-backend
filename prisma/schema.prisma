@@ -1,6 +1,5 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -44,18 +43,28 @@ model Location {
   employees  Employee[]
   menus      Menu[]
   orders     Order[]
-  feedbacks  Feedback[]
   devices    Device[]
 }
 
 model Employee {
-  id         String   @id @default(uuid())
-  name       String
-  userId     String   @unique
-  locationId String
-  location   Location @relation(fields: [locationId], references: [id])
-  user       User     @relation(fields: [userId], references: [id])
-  orders     Order[]
+  id          String    @id @default(uuid())
+  name        String
+  rating      Float @default(0)
+  position    String @default("unknown")
+  email       String?
+  phone       String?
+  telegram    String?
+  experience  Int?
+  hiredDate   DateTime @default(now())
+
+  userId      String    @unique
+  user        User      @relation(fields: [userId], references: [id])
+
+  locationId  String
+  location    Location  @relation(fields: [locationId], references: [id])
+
+  orders      Order[]
+  reviews     Review[]
 }
 
 model Device {
@@ -67,31 +76,51 @@ model Device {
 }
 
 model Menu {
-  id         String   @id @default(uuid())
-  name       String
-  price      Float
-  locationId String
-  location   Location @relation(fields: [locationId], references: [id])
-  isActive   Boolean  @default(true)
+  id          String   @id @default(uuid())
+  name        String
+  price       Float
+  category    String
+  description String?
+  isActive    Boolean  @default(true)
+
+  locationId  String
+  location    Location @relation(fields: [locationId], references: [id])
 }
 
 model Order {
-  id          String   @id @default(uuid())
-  total       Float
-  createdAt   DateTime @default(now())
-  locationId  String
-  location    Location @relation(fields: [locationId], references: [id])
-  employeeId  String
-  employee    Employee @relation(fields: [employeeId], references: [id])
+  id           String      @id @default(uuid())
+  customerName String
+  total        Float
+  createdAt    DateTime    @default(now())
+
+  locationId   String
+  location     Location    @relation(fields: [locationId], references: [id])
+
+  employeeId   String
+  employee     Employee    @relation(fields: [employeeId], references: [id])
+
+  items        OrderItem[]
 }
 
-model Feedback {
-  id          String   @id @default(uuid())
-  rating      Int
-  comment     String
-  createdAt   DateTime @default(now())
-  locationId  String
-  location    Location @relation(fields: [locationId], references: [id])
+model OrderItem {
+  id        String   @id @default(uuid())
+  menuId    String
+  name      String
+  price     Float
+  quantity  Int
+
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id])
+}
+
+model Review {
+  id           String    @id @default(uuid())
+  employeeId   String
+  employee     Employee  @relation(fields: [employeeId], references: [id])
+  customerName String
+  rating       Int
+  comment      String
+  date         DateTime  @default(now())
 }
 
 model Log {

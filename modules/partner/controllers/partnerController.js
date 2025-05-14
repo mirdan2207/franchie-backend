@@ -71,13 +71,13 @@ class PartnerController {
                 return res.status(403).json({ error: 'Доступ запрещен. Требуются права партнера' });
             }
             const partnerId = req.user.partner.id;
-            const { locationId, email, name, password } = req.body;
+            const { locationId, email, name, password, position, phone, telegram, experience, hiredDate } = req.body;
 
-            if (!locationId || !email || !name || !password) {
+            if (!locationId || !email || !name || !password || !position || !hiredDate) {
                 return res.status(400).json({ error: 'Все поля обязательны для заполнения' });
             }
 
-            const employee = await partnerService.createEmployee(partnerId, locationId, email, name, password);
+            const employee = await partnerService.createEmployee(partnerId, locationId, email, name, password, position, phone, telegram, experience, hiredDate);
             res.status(201).json(employee);
         } catch (error) {
             console.error('Error creating employee:', error);
@@ -129,13 +129,13 @@ class PartnerController {
     async createMenuItem(req, res) {
         try {
             const partnerId = req.user.partner.id;
-            const { locationId, name, price } = req.body;
+            const { locationId, name, price, category, description } = req.body;
 
-            if (!locationId || !name || !price) {
+            if (!locationId || !name || !price || !category) {
                 return res.status(400).json({ error: 'Все поля обязательны для заполнения' });
             }
 
-            const menuItem = await partnerService.createMenuItem(partnerId, locationId, name, price);
+            const menuItem = await partnerService.createMenuItem(partnerId, locationId, name, price, category, description);
             res.status(201).json(menuItem);
         } catch (error) {
             console.error('Error creating menu item:', error);
@@ -150,13 +150,13 @@ class PartnerController {
         try {
             const partnerId = req.user.partner.id;
             const { menuId } = req.params;
-            const { name, price, isActive } = req.body;
+            const { name, price, isActive, category, description } = req.body;
 
-            if (!name && !price && isActive === undefined) {
+            if (!name && !price && isActive === undefined && !category && !description) {
                 return res.status(400).json({ error: 'Необходимо указать хотя бы одно поле для обновления' });
             }
 
-            const menuItem = await partnerService.updateMenuItem(partnerId, menuId, { name, price, isActive });
+            const menuItem = await partnerService.updateMenuItem(partnerId, menuId, { name, price, isActive, category, description});
             res.json(menuItem);
         } catch (error) {
             console.error('Error updating menu item:', error);

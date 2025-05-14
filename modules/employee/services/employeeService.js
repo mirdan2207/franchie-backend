@@ -13,7 +13,12 @@ class EmployeeService {
                     select: {
                         id: true,
                         name: true,
-                        address: true
+                        rating: true,
+                        position: true,
+                        phone: true,
+                        telegram: true,
+                        experience: true,
+                        hiredDate: true,
                     }
                 },
                 user: {
@@ -37,12 +42,18 @@ class EmployeeService {
     }
 
     // Создание заказа
-    async createOrder(employeeId, locationId, total) {
+    async createOrder(employeeId, locationId, customerName, orderItems) {
+        total = 0
+        orderItems.forEach(orderItem => {
+            total += orderItem.quantity * orderItem.price;
+        });
         return prisma.order.create({
             data: {
+                customerName,
                 total,
                 locationId,
-                employeeId
+                employeeId, 
+                orderItems
             }
         });
     }
