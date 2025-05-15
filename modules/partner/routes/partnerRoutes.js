@@ -18,6 +18,7 @@ router.get('/locations', partnerController.getLocations);
 
 // Маршруты для работы с сотрудниками
 router.post('/employees', partnerController.createEmployee);
+router.put('employees/:employeeId', partnerController.updateEmployee);
 router.delete('/employees/:employeeId', partnerController.deleteEmployee);
 
 // Маршруты для работы с устройствами
@@ -31,6 +32,7 @@ router.put('/menu/:menuId', partnerController.updateMenuItem);
 router.delete('/menu/:menuId', partnerController.deleteMenuItem);
 
 // Маршруты для работы с заказами
+router.get('/locations/:locationId/employees', partnerController.getEmployees);
 router.get('/locations/:locationId/orders', partnerController.getLocationOrders);
 
 // Маршруты для работы с отзывами

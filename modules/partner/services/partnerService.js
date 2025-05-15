@@ -154,6 +154,49 @@ class PartnerService {
         return user;
     }
 
+// Получить всех сотрудников по всем локациям партнера
+async getEmployees(partnerId) {
+    return prisma.employee.findMany({
+        where: {
+            location: {
+                partnerId: partnerId, // 👈 условие по связи через location
+            },
+        },
+        include: {
+            location: {
+                select: {
+                    id: true,
+                    name: true,
+                },
+            },
+        },
+    });
+}
+
+
+    // Обновление данных сотрудника
+async updateEmployee(partnerId, employeeId, updateData) {
+    const employee = await prisma.employee.findFirst({
+        where: {
+            id: employeeId,
+            location: {
+                partnerId: partnerId, // 👈 опять же — фильтр по связанной локации
+            },
+        },
+    });
+
+    if (!employee) {
+        throw new Error('Сотрудник не найден или не принадлежит вашей локации');
+    }
+
+    return prisma.employee.update({
+        where: {
+            id: employeeId,
+        },
+        data: updateData,
+    });
+}
+
     async deleteEmployee(partnerId, employeeId) {
         // Проверяем, что сотрудник работает в локации партнера
         const employee = await prisma.employee.findFirst({

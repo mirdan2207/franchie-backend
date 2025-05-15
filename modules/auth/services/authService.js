@@ -78,7 +78,7 @@ class AuthService {
 
     // Формируем ответ в зависимости от роли
     const userResponse = {
-      // id: user.id,
+      id: user.id,
       email: user.email,
       role: user.role
     };

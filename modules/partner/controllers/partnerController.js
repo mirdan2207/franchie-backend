@@ -88,6 +88,50 @@ class PartnerController {
         }
     }
 
+async getEmployees(req, res) {
+    try {
+        const partnerId = req.user.partner.id;
+        const { locationId } = req.params;
+
+        if (!locationId) {
+            return res.status(400).json({ error: 'ID локации обязателен' });
+        }
+
+        const employees = await partnerService.getEmployees(partnerId, locationId);
+        res.json(employees);
+    } catch (error) {
+        console.error('Error getting employees:', error);
+        if (error.message === 'Локация не найдена или не принадлежит партнеру') {
+            return res.status(404).json({ error: error.message });
+        }
+        res.status(500).json({ error: 'Ошибка при получении списка сотрудников' });
+    }
+}
+
+
+async updateEmployee(req, res) {
+    try {
+        const partnerId = req.user.partner.id;
+        const { employeeId } = req.params;
+        const updateFields = req.body;
+
+        if (Object.keys(updateFields).length === 0) {
+            return res.status(400).json({ error: 'Необходимо указать хотя бы одно поле для обновления' });
+        }
+
+        const updatedEmployee = await partnerService.updateEmployee(partnerId, employeeId, updateFields);
+        res.json(updatedEmployee);
+    } catch (error) {
+        console.error('Error updating employee:', error);
+        if (error.message === 'Сотрудник не найден или не работает в вашей локации') {
+            return res.status(404).json({ error: error.message });
+        }
+        res.status(500).json({ error: 'Ошибка при обновлении данных сотрудника' });
+    }
+}
+
+
+
     async deleteEmployee(req, res) {
         try {
             const partnerId = req.user.partner.id;
