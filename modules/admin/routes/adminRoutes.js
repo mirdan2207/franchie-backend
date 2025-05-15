@@ -19,5 +19,7 @@ router.delete('/partners/:partnerId', adminController.deletePartner);
 // Маршруты для работы с локациями
 router.post('/locations', adminController.createLocation);
 router.get('/locations', adminController.getLocations);
+router.put('/locations/:locationId', adminController.updateLocation);
+router.delete('/locations/:locationId', adminController.deletePartner)
 
 module.exports = router; 

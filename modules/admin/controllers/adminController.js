@@ -71,6 +71,29 @@ async deletePartner(req, res) {
         }
     }
 
+    async updateLocation(req, res) {
+        const { locationId } = req.params;
+    const { name, address } = req.body;
+
+    try {
+        const location = await adminService.updateLocation(locationId, name, address);
+        res.json(location);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+    }
+
+    async deletePartner(req, res) {
+        const { locationId } = req.params;
+
+    try {
+        const result = await adminService.deleteLocation(locationId);
+        res.json(result);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+    }
+
     async getPartners(req, res) {
         try {
             const partners = await adminService.getPartners();

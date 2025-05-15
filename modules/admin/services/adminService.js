@@ -118,6 +118,39 @@ class AdminService {
         return location;
     }
 
+    // Внутри класса AdminService
+
+async updateLocation(locationId, name, address) {
+    const dataToUpdate = {};
+    if (name) dataToUpdate.name = name;
+    if (address) dataToUpdate.address = address;
+
+    const location = await prisma.location.update({
+        where: { id: locationId },
+        data: dataToUpdate
+    });
+
+    return location;
+}
+
+async deleteLocation(locationId) {
+    // Проверим, существует ли локация
+    const location = await prisma.location.findUnique({
+        where: { id: locationId }
+    });
+
+    if (!location) {
+        throw new Error('Location not found');
+    }
+
+    await prisma.location.delete({
+        where: { id: locationId }
+    });
+
+    return { message: 'Location deleted successfully' };
+}
+
+
     async getPartners() {
         return prisma.partner.findMany({
             include: {
