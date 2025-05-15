@@ -13,6 +13,7 @@ router.use(logMiddleware);
 // Маршруты для работы с партнерами
 router.post('/partners', adminController.createPartner);
 router.get('/partners', adminController.getPartners);
+router.put('/partners', adminController.updatePartner);
 
 // Маршруты для работы с локациями
 router.post('/locations', adminController.createLocation);

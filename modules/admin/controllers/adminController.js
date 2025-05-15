@@ -17,6 +17,27 @@ class AdminController {
         }
     }
 
+    async updatePartner(req, res) {
+    try {
+        const { partnerId } = req.params;
+        const { email, password, name } = req.body;
+
+        if (!partnerId) {
+            return res.status(400).json({ error: 'partnerId is required' });
+        }
+
+        if (!email && !password && !name) {
+            return res.status(400).json({ error: 'At least one field (email, password, name) must be provided' });
+        }
+
+        const updatedPartner = await adminService.updatePartner(partnerId, email, password, name);
+        res.status(200).json(updatedPartner);
+    } catch (error) {
+        console.error('Error updating partner:', error);
+        res.status(500).json({ error: 'Error updating partner' });
+    }
+}
+
     async createLocation(req, res) {
         try {
             const { partnerId, name, address } = req.body;
