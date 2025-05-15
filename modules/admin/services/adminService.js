@@ -98,15 +98,17 @@ class AdminService {
         throw new Error('Partner not found');
     }
 
-    // Сначала удаляем партнёра
-    await prisma.partner.delete({
-        where: { id: partnerId }
-    });
 
     // Удаляем сначала пользователя, так как он связан по внешнему ключу
     await prisma.user.delete({
         where: { id: partner.userId }
     });
+
+        // Сначала удаляем партнёра
+    await prisma.partner.delete({
+        where: { id: partnerId }
+    });
+
 
     return { message: 'Partner and associated user deleted successfully' };
 }
