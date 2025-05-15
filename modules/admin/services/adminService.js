@@ -105,9 +105,9 @@ class AdminService {
     });
 
         // Сначала удаляем партнёра
-    await prisma.partner.delete({
-        where: { id: partnerId }
-    });
+    // await prisma.partner.delete({
+    //     where: { id: partnerId }
+    // });
 
 
     return { message: 'Partner and associated user deleted successfully' };

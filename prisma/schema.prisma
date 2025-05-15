@@ -30,7 +30,7 @@ model Partner {
   id        String     @id @default(uuid())
   userId    String     @unique
   name      String
-  user      User       @relation(fields: [userId], references: [id])
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   locations Location[]
 }
 
@@ -58,7 +58,7 @@ model Employee {
   hiredDate   DateTime @default(now())
 
   userId      String    @unique
-  user        User      @relation(fields: [userId], references: [id])
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   locationId  String
   location    Location  @relation(fields: [locationId], references: [id])
