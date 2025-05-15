@@ -38,6 +38,23 @@ class AdminController {
     }
 }
 
+async deletePartner(req, res) {
+    try {
+        const { partnerId } = req.params;
+
+        if (!partnerId) {
+            return res.status(400).json({ error: 'partnerId is required' });
+        }
+
+        const result = await adminService.deletePartner(partnerId);
+        res.status(200).json(result);
+    } catch (error) {
+        console.error('Error deleting partner:', error);
+        res.status(500).json({ error: 'Error deleting partner' });
+    }
+}
+
+
     async createLocation(req, res) {
         try {
             const { partnerId, name, address } = req.body;
