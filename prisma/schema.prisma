@@ -39,7 +39,7 @@ model Location {
   name       String
   address    String
   partnerId  String
-  partner    Partner     @relation(fields: [partnerId], references: [id])
+  partner    Partner     @relation(fields: [partnerId], references: [id], onDelete: Cascade)
   employees  Employee[]
   menus      Menu[]
   orders     Order[]
@@ -72,7 +72,7 @@ model Device {
   login       String   @unique
   password    String
   locationId  String
-  location    Location @relation(fields: [locationId], references: [id])
+  location    Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
 }
 
 model Menu {
@@ -94,7 +94,7 @@ model Order {
   createdAt    DateTime    @default(now())
 
   locationId   String
-  location     Location    @relation(fields: [locationId], references: [id])
+  location     Location    @relation(fields: [locationId], references: [id], onDelete: Cascade)
 
   employeeId   String
   employee     Employee    @relation(fields: [employeeId], references: [id])
@@ -116,7 +116,7 @@ model OrderItem {
 model Review {
   id           String    @id @default(uuid())
   employeeId   String
-  employee     Employee  @relation(fields: [employeeId], references: [id])
+  employee     Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   customerName String
   rating       Int
   comment      String
