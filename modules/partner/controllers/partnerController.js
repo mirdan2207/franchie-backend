@@ -71,13 +71,13 @@ class PartnerController {
                 return res.status(403).json({ error: 'Доступ запрещен. Требуются права партнера' });
             }
             const partnerId = req.user.partner.id;
-            const { locationId, email, name, password, position, phone, telegram, experience, hiredDate } = req.body;
+            const { locationId, email, name, password, position, phone, telegram, experience, hiredDate, rating } = req.body;
 
             if (!locationId || !email || !name || !password || !position || !hiredDate) {
                 return res.status(400).json({ error: 'Все поля обязательны для заполнения' });
             }
 
-            const employee = await partnerService.createEmployee(partnerId, locationId, email, name, password, position, phone, telegram, experience, hiredDate);
+            const employee = await partnerService.createEmployee(partnerId, locationId, email, name, password, position, phone, telegram, experience, hiredDate, rating);
             res.status(201).json(employee);
         } catch (error) {
             console.error('Error creating employee:', error);

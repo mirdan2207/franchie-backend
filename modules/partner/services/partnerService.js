@@ -112,7 +112,7 @@ class PartnerService {
     }
 
     // Управление сотрудниками
-    async createEmployee(partnerId, locationId, email, name, password, position, phone, telegram, experience, hiredDate) {
+    async createEmployee(partnerId, locationId, email, name, password, position, phone, telegram, experience, hiredDate, rating) {
         // Проверяем, что локация принадлежит партнеру
         const location = await prisma.location.findFirst({
             where: {
@@ -142,7 +142,8 @@ class PartnerService {
                         phone, 
                         telegram, 
                         experience, 
-                        hiredDate
+                        hiredDate,
+                        rating
                     }
                 }
             },
