@@ -1,11 +1,13 @@
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
 const prisma = new PrismaClient();
+const { PrismaClientKnownRequestError } = require('@prisma/client/runtime/library');
 
 class AdminService {
     async createPartner(email, password, name) {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    try {
         const user = await prisma.user.create({
             data: {
                 email,
@@ -23,7 +25,14 @@ class AdminService {
         });
 
         return user;
+    } catch (error) {
+        if (error instanceof PrismaClientKnownRequestError && error.code === 'P2002') {
+            throw new Error('User with this email already exists');
+        }
+
+        throw error;
     }
+}
 
     async updatePartner(partnerId, email, password, name) {
     // Получаем партнёра и его пользователя
@@ -122,7 +131,7 @@ async deletePartner(partnerId) {
         where: { id: partnerId }
     });
 
-    // Удаляем пользователя
+    //Удаляем пользователя
     await prisma.user.delete({
         where: { id: partner.userId }
     });

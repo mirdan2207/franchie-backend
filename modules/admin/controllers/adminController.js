@@ -2,20 +2,26 @@ const adminService = require('../services/adminService');
 
 class AdminController {
     async createPartner(req, res) {
-        try {
-            const { email, password, name } = req.body;
-            
-            if (!email || !password || !name) {
-                return res.status(400).json({ error: 'All fields are required' });
-            }
+    try {
+        const { email, password, name } = req.body;
 
-            const partner = await adminService.createPartner(email, password, name);
-            res.status(201).json(partner);
-        } catch (error) {
-            console.error('Error creating partner:', error);
-            res.status(500).json({ error: 'Error creating partner' });
+        if (!email || !password || !name) {
+            return res.status(400).json({ error: 'All fields are required' });
         }
+
+        const partner = await adminService.createPartner(email, password, name);
+        res.status(201).json(partner);
+    } catch (error) {
+        console.error('Error creating partner:', error);
+
+        if (error.message === 'User with this email already exists') {
+            return res.status(409).json({ error: error.message });
+        }
+
+        res.status(500).json({ error: 'Error creating partner' });
     }
+}
+
 
     async updatePartner(req, res) {
     try {
