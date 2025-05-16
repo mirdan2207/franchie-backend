@@ -87,31 +87,49 @@ class AdminService {
 }
 
 
-    async deletePartner(partnerId) {
-    // Проверка: существует ли партнёр
+async deletePartner(partnerId) {
+    // Получаем партнёра и все связанные сущности
     const partner = await prisma.partner.findUnique({
         where: { id: partnerId },
-        include: { user: true }
+        include: {
+            user: true,
+            locations: {
+                include: {
+                    employees: true
+                }
+            }
+        }
     });
 
     if (!partner) {
         throw new Error('Partner not found');
     }
 
+    // Удаляем сотрудников, привязанных к локациям партнёра
+    for (const location of partner.locations) {
+        await prisma.employee.deleteMany({
+            where: { locationId: location.id }
+        });
+    }
 
-    // Удаляем сначала пользователя, так как он связан по внешнему ключу
+    // Удаляем локации партнёра
+    await prisma.location.deleteMany({
+        where: { partnerId: partnerId }
+    });
+
+    // Удаляем партнёра
+    await prisma.partner.delete({
+        where: { id: partnerId }
+    });
+
+    // Удаляем пользователя
     await prisma.user.delete({
         where: { id: partner.userId }
     });
 
-        // Сначала удаляем партнёра
-    // await prisma.partner.delete({
-    //     where: { id: partnerId }
-    // });
-
-
-    return { message: 'Partner and associated user deleted successfully' };
+    return { message: 'Partner and associated data deleted successfully' };
 }
+
 
     async createLocation(partnerId, name, address) {
         const location = await prisma.location.create({
