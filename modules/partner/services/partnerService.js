@@ -156,12 +156,21 @@ class PartnerService {
     }
 
 // Получить всех сотрудников по всем локациям партнера
-async getEmployees(partnerId) {
+async getEmployees(partnerId, locationId) {
+        const location = await prisma.location.findFirst({
+        where: {
+            id: locationId,
+            partnerId: partnerId
+        }
+    });
+
+        if (!location) {
+        throw new Error('Локация не найдена или не принадлежит партнеру');
+    }
+
     return prisma.employee.findMany({
         where: {
-            location: {
-                partnerId: partnerId, // 👈 условие по связи через location
-            },
+            locationId: locationId
         },
         include: {
             location: {
