@@ -83,7 +83,7 @@ async deletePartner(req, res) {
     }
     }
 
-    async deletePartner(req, res) {
+    async deleteLocation(req, res) {
         const { locationId } = req.params;
 
     try {

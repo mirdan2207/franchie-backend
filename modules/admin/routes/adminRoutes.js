@@ -20,6 +20,6 @@ router.delete('/partners/:partnerId', adminController.deletePartner);
 router.post('/locations', adminController.createLocation);
 router.get('/locations', adminController.getLocations);
 router.put('/locations/:locationId', adminController.updateLocation);
-router.delete('/locations/:locationId', adminController.deletePartner)
+router.delete('/locations/:locationId', adminController.deleteLocation)
 
 module.exports = router; 
